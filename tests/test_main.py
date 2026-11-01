@@ -83,6 +83,5 @@ class TestValidateArguments(unittest.TestCase):
                 "(максимум 50 символов)."
             )
 
-
 if __name__ == "__main__":
     unittest.main()

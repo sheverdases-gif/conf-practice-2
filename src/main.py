@@ -1,5 +1,6 @@
 import argparse
 import sys
+from npm_parser import get_package_info, extract_dependencies
 
 MAX_FILTER_LEN = 50
 
@@ -83,9 +84,8 @@ def print_configuration(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    """Главная функция приложения."""
     print("Запуск инструмента визуализации графа зависимостей "
-          "(Этап 1)...")
+          "(Этап 2)...")
 
     args = parse_arguments()
 
@@ -94,8 +94,29 @@ def main() -> None:
         sys.exit(1)
 
     print_configuration(args)
-    print("\n[Заглушка] Здесь будет логика сбора данных "
-          "о зависимостях...")
+    print()
+
+    if not args.test_mode:
+        try:
+            print(f"Получение данных для пакета '{args.package}'...")
+            package_info = get_package_info(args.package, args.repo)
+            
+            deps = extract_dependencies(package_info)
+            
+            print(f"\nПрямые зависимости пакета '{args.package}':")
+            if not deps:
+                print("  (зависимостей не найдено)")
+            else:
+                for dep in deps:
+                    print(f"  - {dep}")
+                    
+        except ValueError as e:
+            print(f"\nОшибка при получении данных: {e}")
+            sys.exit(1)
+    else:
+        print("\n[Режим тестирования]")
+        print("Здесь будет парсинг локального файла "
+              "(будет реализовано на Этапе 3).")
 
 
 if __name__ == "__main__":
