@@ -25,3 +25,23 @@
 ```bash
 python src/main.py --package express --repo https://registry.npmjs.org/express --filter dev
 ```
+
+## Этап 2. Сбор данных
+
+На данном этапе реализовано получение информации о прямых зависимостях пакета из npm-реестра.
+
+**Пример запуска:**
+
+```bash
+python src/main.py --package express --repo https://registry.npmjs.org
+
+Ожидаемый результат: Вывод списка прямых зависимостей пакета express (accepts, array-flatten, body-parser и т.д.).
+
+python src/main.py --package non-existent-package-12345 --repo https://registry.npmjs.org
+
+Ожидаемый результат: Сообщение об ошибке Пакет 'non-existent-package-12345' не найден в репозитории. и завершение работы.
+
+python src/main.py --help
+
+Ожидаемый результат: Список всех флагов (--package, --repo, --test-mode, --filter) с их описанием.
+```
