@@ -1,0 +1,6 @@
+{
+  "App": ["LibA", "LibB"],
+  "LibA": ["Core"],
+  "LibB": ["Core"],
+  "Core": []
+}

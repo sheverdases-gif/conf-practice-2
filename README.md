@@ -45,3 +45,78 @@ python src/main.py --help
 
 Ожидаемый результат: Список всех флагов (--package, --repo, --test-mode, --filter) с их описанием.
 ```
+
+## Этап 3. Основные операции
+
+На данном этапе реализован алгоритм обхода графа зависимостей в глубину (DFS) с рекурсией. Алгоритм строит транзитивный граф зависимостей, корректно обрабатывает циклические зависимости (не уходит в бесконечный цикл) и поддерживает фильтрацию пакетов по подстроке.
+
+**Тестовые репозитории:**
+Для проверки работы созданы три файла в корне проекта:
+
+1. `test_repo.json` — базовый граф с циклами (A->C->A) и пакетами для фильтрации (TEST_PKG).
+2. `test_repo_linear.json` — линейный граф без циклов для проверки порядка загрузки.
+3. `test_repo_deep.json` — граф с глубокой вложенностью (6 уровней) для проверки рекурсии.
+
+**Пример запуска (Базовый случай с циклами):**
+
+```bash
+python src/main.py --package A --repo test_repo.json --test-mode
+Ожидаемый разультат: --- Построенный граф зависимостей ---
+A -> B, C
+B -> D
+D -> нет
+C -> E
+E -> нет
+
+python src/main.py --package A --repo test_repo.json --test-mode --filter D
+Ожидаемый результат: --- Построенный граф зависимостей ---
+A -> B, C
+B -> нет
+C -> E
+E -> нет
+
+python src/main.py --package App --repo test_repo_linear.json --test-mode
+Ожидаемый результат:--- Построенный граф зависимостей ---
+App -> LibA, LibB
+LibA -> Core
+LibB -> Core
+Core -> нет
+
+python src/main.py --package Root --repo test_repo_deep.json --test-mode
+Ожидаемый результат:--- Построенный граф зависимостей ---
+Root -> L1
+L1 -> L2
+L2 -> L3
+L3 -> L4
+L4 -> L5
+L5 -> Leaf
+Leaf -> нет
+
+python src/main.py -p express -r https://registry.npmjs.org
+Ожидаемый результат:
+Запуск инструмента визуализации графа зависимостей (Этап 3)...
+--- Конфигурация эмулятора ---
+package: express
+repo: https://registry.npmjs.org
+test_mode: False
+filter:
+
+Построение графа для пакета 'express'...
+
+--- Построенный граф зависимостей ---
+express -> accepts, array-flatten, body-parser...
+accepts -> mime-types, negotiator
+mime-types -> mime-db
+negotiator -> нет
+body-parser -> bytes, content-type, debug...
+bytes -> нет
+content-type -> нет
+debug -> ms
+ms -> нет
+... (и так далее, очень много строк)
+
+python src/main.py -p debug -r https://registry.npmjs.org
+Ожидаемый результат:--- Построенный граф зависимостей ---
+debug -> ms
+ms -> нет
+```
